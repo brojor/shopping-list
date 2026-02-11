@@ -6,6 +6,7 @@ on:
     paths:
       - 'apps/client/**'
       - Dockerfile
+      - nginx.conf
 
 permissions:
   contents: read

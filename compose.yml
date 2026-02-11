@@ -1,0 +1,39 @@
+services:
+  client:
+    image: ghcr.io/brojor/shopping-list-client:latest
+    container_name: shopping-list-client
+    restart: unless-stopped
+    depends_on:
+      server:
+        condition: service_started
+    ports:
+      - "80:8080"
+
+  server:
+    image: ghcr.io/brojor/shopping-list-server:latest
+    container_name: shopping-list-server
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-shopping_list}:${POSTGRES_PASSWORD:-shopping_list}@postgres:5432/${POSTGRES_DB:-shopping_list}
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: shopping-list-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-shopping_list}
+      POSTGRES_USER: ${POSTGRES_USER:-shopping_list}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-shopping_list}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-shopping_list} -d ${POSTGRES_DB:-shopping_list}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
