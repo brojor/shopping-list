@@ -14,10 +14,21 @@ services:
     container_name: shopping-list-server
     restart: unless-stopped
     depends_on:
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-shopping_list}:${POSTGRES_PASSWORD:-shopping_list}@postgres:5432/${POSTGRES_DB:-shopping_list}
+
+  migrate:
+    image: ghcr.io/brojor/shopping-list-server:latest
+    container_name: shopping-list-migrate
+    restart: "no"
+    depends_on:
       postgres:
         condition: service_healthy
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER:-shopping_list}:${POSTGRES_PASSWORD:-shopping_list}@postgres:5432/${POSTGRES_DB:-shopping_list}
+    command: ["node", "dist/src/db/migrate.js"]
 
   postgres:
     image: postgres:17-alpine
