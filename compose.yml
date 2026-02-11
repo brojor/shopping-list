@@ -14,7 +14,7 @@ services:
     container_name: shopping-list-server
     restart: unless-stopped
     depends_on:
-      migrate:
+      seed:
         condition: service_completed_successfully
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER:-shopping_list}:${POSTGRES_PASSWORD:-shopping_list}@postgres:5432/${POSTGRES_DB:-shopping_list}
@@ -29,6 +29,17 @@ services:
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER:-shopping_list}:${POSTGRES_PASSWORD:-shopping_list}@postgres:5432/${POSTGRES_DB:-shopping_list}
     command: ["node", "dist/src/db/migrate.js"]
+
+  seed:
+    image: ghcr.io/brojor/shopping-list-server:latest
+    container_name: shopping-list-seed
+    restart: "no"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-shopping_list}:${POSTGRES_PASSWORD:-shopping_list}@postgres:5432/${POSTGRES_DB:-shopping_list}
+    command: ["node", "dist/src/db/seed.js"]
 
   postgres:
     image: postgres:17-alpine

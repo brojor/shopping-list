@@ -6,6 +6,7 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "migrate": "node dist/src/db/migrate.js",
+    "seed": "node dist/src/db/seed.js",
     "db:generate": "drizzle-kit generate",
     "start": "node dist/src/index.js",
     "lint": "eslint",

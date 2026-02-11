@@ -4,7 +4,6 @@ import { eq } from 'drizzle-orm'
 import { drizzle } from 'drizzle-orm/node-postgres'
 import { Hono } from 'hono'
 import { catalogTable, listItemTable, listTable } from './db/schema.js'
-import items from './items.json' with { type: 'json' }
 import 'dotenv/config'
 
 const app = new Hono()
@@ -13,10 +12,6 @@ const db = drizzle(process.env.DATABASE_URL!)
 
 api.get('/', (c) => {
   return c.text('Hello Hono!')
-})
-
-app.get('/initialize', (c) => {
-  return c.json(db.insert(catalogTable).values(items.map(item => ({ name: item }))).then(catalog => catalog))
 })
 
 // GET /catalog?query=
